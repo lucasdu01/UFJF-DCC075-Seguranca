@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>DCC075 - Segurança</title>
+</head>
+<body>
+<h1>DCC075 — Segurança em Sistemas Computacionais</h1>
+
+<ul>
+    <!-- th:each repete o <li> para cada item da lista "activities" -->
+    <li th:each="activity : ${activities}">
+        <a th:href="@{${activity.path}}" th:text="${activity.title}">Título</a>
+        — <span th:text="${activity.description}">Descrição</span>
+    </li>
+</ul>
+</body>
+</html>
