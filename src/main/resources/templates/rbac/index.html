@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>01 – RBAC | DCC075</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ---------- Tokens ---------- */
+        :root {
+            --bg: #eef1f4;
+            --surface: #ffffff;
+            --ink: #1c2430;
+            --muted: #5b6675;
+            --line: #d5dbe2;
+            --allow: #1f7a4d;
+            --allow-bg: #e3f3ea;
+            --deny: #b3261e;
+            --deny-bg: #fbe9e7;
+            --warn: #8a5a00;
+            --warn-bg: #fff4d6;
+            /* uma cor por papel, usada no crachá, nas etiquetas e na matriz */
+            --role-vendedor: #2b5fd9;
+            --role-estoquista: #c98a00;
+            --role-gerente: #6b3fa0;
+            --radius: 10px;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #151a21; --surface: #1e252f; --ink: #e8edf3; --muted: #9aa6b4; --line: #333d4a;
+                --allow: #5fcf95; --allow-bg: #173327; --deny: #ff8a80; --deny-bg: #3a1f1e;
+                --warn: #f2c25b; --warn-bg: #3a2f14;
+                --role-vendedor: #7ea2ff; --role-estoquista: #f0b93a; --role-gerente: #b48ae6;
+            }
+        }
+
+        /* ---------- Base ---------- */
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; background: var(--bg); color: var(--ink);
+            font: 16px/1.5 "Atkinson Hyperlegible", system-ui, sans-serif;
+        }
+        a { color: inherit; }
+        button, input { font: inherit; color: inherit; }
+        :focus-visible { outline: 3px solid var(--role-vendedor); outline-offset: 2px; }
+        .num { font-variant-numeric: tabular-nums; }
+        .muted { color: var(--muted); }
+
+        /* ---------- Layout ---------- */
+        .page { max-width: 1180px; margin: 0 auto; padding: 24px 16px 64px; }
+        .page-header { margin-bottom: 24px; }
+        .page-header a { font-size: .9rem; color: var(--muted); text-decoration: none; }
+        .page-header a:hover { text-decoration: underline; }
+        .page-header h1 { margin: 8px 0 4px; font-size: 1.9rem; line-height: 1.2; }
+        .page-header p { margin: 0; color: var(--muted); max-width: 65ch; }
+
+        .layout { display: grid; gap: 24px; grid-template-columns: 320px minmax(0, 1fr); align-items: start; }
+        .layout > aside { position: sticky; top: 16px; }
+        .main-col { display: grid; gap: 24px; }
+        @media (max-width: 900px) {
+            .layout { grid-template-columns: 1fr; }
+            .layout > aside { position: static; }
+        }
+
+        .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+        .panel > h2 { margin: 0; font-size: 1.25rem; }
+        .panel > .lead { margin: 4px 0 16px; color: var(--muted); font-size: .95rem; }
+        .panel h3 { font-size: 1rem; margin: 24px 0 8px; }
+
+        /* ---------- Crachá (sessão atual) ---------- */
+        .badge-card { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+        .badge-stripes { display: flex; height: 10px; background: var(--line); }
+        .badge-stripes span { flex: 1; }
+        .badge-body { padding: 16px; }
+        .badge-name { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+        .badge-user { color: var(--muted); font-size: .9rem; }
+        .badge-card.anon { border-style: dashed; }
+        .badge-card.anon .badge-stripes { background: repeating-linear-gradient(45deg, var(--line) 0 6px, transparent 6px 12px); }
+
+        .perm-list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 4px; }
+        .perm-list li { display: flex; gap: 8px; align-items: center; font-size: .95rem; }
+        .perm-list .yes { color: var(--allow); }
+        .perm-list .no { color: var(--muted); text-decoration: line-through; }
+        .mark { width: 1.2em; text-align: center; font-weight: 700; flex: none; }
+
+        /* ---------- Etiquetas de papel ---------- */
+        .roles { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+        .role {
+            display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; font-weight: 700;
+            padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor;
+        }
+        .role::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+        .role-vendedor { color: var(--role-vendedor); }
+        .role-estoquista { color: var(--role-estoquista); }
+        .role-gerente { color: var(--role-gerente); }
+        .role-none { color: var(--muted); border-style: dashed; }
+        .role-none::before { display: none; }
+        .bg-vendedor { background: var(--role-vendedor); }
+        .bg-estoquista { background: var(--role-estoquista); }
+        .bg-gerente { background: var(--role-gerente); }
+
+        /* ---------- Troca de usuário ---------- */
+        .user-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+        .user-btn {
+            width: 100%; text-align: left; cursor: pointer; background: transparent;
+            border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+        }
+        .user-btn:hover { border-color: var(--muted); }
+        .user-btn[aria-current="true"] { border: 2px solid var(--ink); padding: 9px 11px; }
+        .user-btn strong { display: block; }
+        .user-btn .roles { margin-top: 4px; }
+        .logout { margin-top: 12px; }
+
+        .btn {
+            cursor: pointer; border-radius: 6px; padding: 6px 12px; font-weight: 700;
+            border: 1px solid var(--ink); background: var(--ink); color: var(--surface);
+        }
+        .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+        .btn-ghost:hover { border-color: var(--muted); }
+        /* ação sem permissão: continua clicável, mas avisa visualmente */
+        .btn.locked { background: transparent; color: var(--muted); border: 1px dashed var(--muted); font-weight: 400; }
+
+        /* ---------- Resultado da última ação ---------- */
+        .result { display: flex; gap: 12px; padding: 12px 14px; border-radius: 8px; margin-bottom: 16px; border-left: 5px solid; }
+        .result strong { display: block; }
+        .result.ok { background: var(--allow-bg); border-color: var(--allow); }
+        .result.denied { background: var(--deny-bg); border-color: var(--deny); }
+        .result.invalid { background: var(--warn-bg); border-color: var(--warn); }
+        .result .mark { font-size: 1.2rem; }
+        .result.ok .mark { color: var(--allow); }
+        .result.denied .mark { color: var(--deny); }
+        .result.invalid .mark { color: var(--warn); }
+
+        /* ---------- Tabelas ---------- */
+        .table-wrap { overflow-x: auto; }
+        table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+        th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+        thead th { font-size: .85rem; color: var(--muted); font-weight: 700; white-space: nowrap; }
+        td.right, th.right { text-align: right; }
+        td.center, th.center { text-align: center; }
+
+        .stock td:first-child { font-weight: 700; }
+        .action { display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+        .action input { width: 5.5rem; padding: 5px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+        .lock-note { font-weight: 400; }
+
+        .empty { padding: 24px; text-align: center; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); }
+        .empty strong { display: block; color: var(--ink); margin-bottom: 4px; }
+
+        /* matriz papel x permissão */
+        .matrix td.cell { text-align: center; font-weight: 700; color: var(--allow); }
+        .matrix tr.mine td { background: color-mix(in srgb, var(--ink) 5%, transparent); }
+        .matrix tfoot td { border-top: 2px solid var(--ink); border-bottom: none; font-weight: 700; }
+        .matrix tfoot td.cell.off { color: var(--deny); }
+        .role-desc { display: block; font-size: .85rem; color: var(--muted); font-weight: 400; }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <header class="page-header">
+        <a th:href="@{/}">&larr; Voltar ao menu</a>
+        <h1>Controle de acesso por papéis</h1>
+        <p>
+            Atividade 01 de DCC075. Estoque de uma loja com três papéis: Vendedor, Estoquista e Gerente.
+            Escolha um funcionário, tente as ações e veja o que o sistema permite ou nega.
+        </p>
+    </header>
+
+    <div class="layout">
+
+        <!-- ===================== 1. SESSÃO ===================== -->
+        <aside class="panel" aria-labelledby="sessao-titulo">
+            <h2 id="sessao-titulo">Sessão</h2>
+            <p class="lead">Quem está usando o sistema agora.</p>
+
+            <!-- Crachá do usuário atual -->
+            <div th:if="${currentUser != null}" class="badge-card">
+                <div class="badge-stripes" aria-hidden="true">
+                    <span th:each="r : ${currentUser.roleNames}" th:class="'bg-' + ${#strings.toLowerCase(r)}"></span>
+                </div>
+                <div class="badge-body">
+                    <div class="badge-name" th:text="${currentUser.displayName}">Nome</div>
+                    <div class="badge-user" th:text="'@' + ${currentUser.username}">@usuario</div>
+                    <div class="roles">
+                        <span th:each="r : ${currentUser.roleNames}" class="role"
+                              th:classappend="'role-' + ${#strings.toLowerCase(r)}" th:text="${r}">PAPEL</span>
+                        <span th:if="${currentUser.roleNames.isEmpty()}" class="role role-none">sem papel</span>
+                    </div>
+                    <!-- Todas as permissões, marcando as que ele tem e as que não tem -->
+                    <ul class="perm-list" aria-label="Permissões efetivas">
+                        <li th:each="perm : ${allPermissions}"
+                            th:class="${myPermissions.contains(perm)} ? 'yes' : 'no'" th:title="${perm.description}">
+                            <span class="mark" aria-hidden="true" th:text="${myPermissions.contains(perm)} ? '✓' : '✕'"></span>
+                            <span th:text="${perm.label}">Permissão</span>                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div th:if="${currentUser == null}" class="badge-card anon">
+                <div class="badge-stripes" aria-hidden="true"></div>
+                <div class="badge-body">
+                    <div class="badge-name">Ninguém conectado</div>
+                    <div class="badge-user">Sem usuário, toda ação é negada.</div>
+                </div>
+            </div>
+
+            <!-- Troca de usuário: cada botão é um POST de login (relação UA visível) -->
+            <h3>Entrar como</h3>
+            <ul class="user-list">
+                <li th:each="u : ${users}">
+                    <form th:action="@{/rbac/login}" method="post">
+                        <input type="hidden" name="username" th:value="${u.username}">
+                        <button type="submit" class="user-btn"
+                                th:attr="aria-current=${currentUser != null and currentUser.username == u.username}">
+                            <strong th:text="${u.displayName}">Nome</strong>
+                            <span class="roles">
+                                <span th:each="r : ${u.roleNames}" class="role"
+                                      th:classappend="'role-' + ${#strings.toLowerCase(r)}" th:text="${r}">PAPEL</span>
+                                <span th:if="${u.roleNames.isEmpty()}" class="role role-none">sem papel</span>
+                            </span>
+                        </button>
+                    </form>
+                </li>
+            </ul>
+
+            <form th:if="${currentUser != null}" th:action="@{/rbac/logout}" method="post" class="logout">
+                <button type="submit" class="btn btn-ghost">Encerrar sessão</button>
+            </form>
+        </aside>
+
+        <div class="main-col">
+
+            <!-- ===================== 2. ESTOQUE ===================== -->
+            <section class="panel" aria-labelledby="estoque-titulo">
+                <h2 id="estoque-titulo">Estoque</h2>
+                <p class="lead">
+                    Ações sem permissão aparecem tracejadas, mas continuam clicáveis:
+                    quem bloqueia é o servidor, não a tela.
+                </p>
+
+                <!-- Resultado da última ação (flash attributes do redirect) -->
+                <div th:if="${success}" class="result ok" role="status">
+                    <span class="mark" aria-hidden="true">✓</span>
+                    <div><strong>Permitido</strong><span th:text="${success}"></span></div>
+                </div>
+                <div th:if="${denied}" class="result denied" role="alert">
+                    <span class="mark" aria-hidden="true">✕</span>
+                    <div><strong>Acesso negado pelo servidor</strong><span th:text="${denied}"></span></div>
+                </div>
+                <div th:if="${error}" class="result invalid" role="alert">
+                    <span class="mark" aria-hidden="true">!</span>
+                    <div><strong>Não foi possível concluir</strong><span th:text="${error}"></span></div>
+                </div>
+
+                <div th:if="${products.isEmpty()}" class="empty">
+                    <strong th:text="${currentUser == null} ? 'Entre como um funcionário para ver o estoque.' : 'Seu papel não inclui ver o estoque.'">Sem acesso</strong>
+                    É preciso a permissão VISUALIZAR_ESTOQUE.
+                </div>
+
+                <div th:unless="${products.isEmpty()}" class="table-wrap">
+                    <table class="stock">
+                        <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th class="right">Estoque</th>
+                            <th class="right">Preço</th>
+                            <th>Vender</th>
+                            <th>Repor</th>
+                            <th>Alterar preço</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="p : ${products}">
+                            <td th:text="${p.name}">Produto</td>
+                            <td class="right num" th:text="${p.quantity}">0</td>
+                            <td class="right num" th:text="'R$ ' + ${#numbers.formatDecimal(p.price, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+                            <td>
+                                <form th:action="@{/rbac/produtos/{id}/vender(id=${p.id})}" method="post" class="action">
+                                    <input type="number" name="quantidade" min="1" value="1" required
+                                           th:attr="aria-label='Quantidade a vender de ' + ${p.name}">
+                                    <button type="submit" class="btn" th:classappend="${canSell} ? '' : 'locked'"
+                                            th:title="${canSell} ? 'Registrar venda' : 'Seu papel não permite vender'">
+                                        <span th:if="${!canSell}" aria-hidden="true">🔒</span> Vender
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <form th:action="@{/rbac/produtos/{id}/repor(id=${p.id})}" method="post" class="action">
+                                    <input type="number" name="quantidade" min="1" value="10" required
+                                           th:attr="aria-label='Quantidade a repor de ' + ${p.name}">
+                                    <button type="submit" class="btn" th:classappend="${canRestock} ? '' : 'locked'"
+                                            th:title="${canRestock} ? 'Registrar entrada' : 'Seu papel não permite repor'">
+                                        <span th:if="${!canRestock}" aria-hidden="true">🔒</span> Repor
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <form th:action="@{/rbac/produtos/{id}/preco(id=${p.id})}" method="post" class="action">
+                                    <input type="number" name="preco" min="0.01" step="0.01" th:value="${p.price}" required
+                                           th:attr="aria-label='Novo preço de ' + ${p.name}">
+                                    <button type="submit" class="btn" th:classappend="${canChangePrice} ? '' : 'locked'"
+                                            th:title="${canChangePrice} ? 'Salvar novo preço' : 'Seu papel não permite alterar preço'">
+                                        <span th:if="${!canChangePrice}" aria-hidden="true">🔒</span> Salvar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ===================== 3. POLÍTICA ===================== -->
+            <section class="panel" aria-labelledby="politica-titulo">
+                <h2 id="politica-titulo">Política de acesso</h2>
+                <p class="lead">
+                    O que cada papel pode fazer. As linhas destacadas são os papéis do usuário atual;
+                    a última linha é a união delas, ou seja, as permissões efetivas.
+                </p>
+
+                <div class="table-wrap">
+                    <table class="matrix">
+                        <thead>
+                        <tr>
+                            <th>Papel</th>
+                            <th th:each="perm : ${allPermissions}" class="center"
+                                th:text="${perm.label}" th:title="${perm} + ': ' + ${perm.description}">Permissão</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="role : ${roles}"
+                            th:class="${currentUser != null and currentUser.roleNames.contains(role.name)} ? 'mine' : ''">
+                            <td>
+                                <span class="role" th:classappend="'role-' + ${#strings.toLowerCase(role.name)}" th:text="${role.name}">PAPEL</span>
+                                <span class="role-desc" th:text="${role.description}">descrição</span>
+                            </td>
+                            <td th:each="perm : ${allPermissions}" class="cell"
+                                th:text="${role.grants(perm)} ? '✓' : ''"
+                                th:attr="aria-label=${role.grants(perm)} ? 'permitido' : 'não permitido'"></td>
+                        </tr>
+                        </tbody>
+                        <tfoot th:if="${currentUser != null}">
+                        <tr>
+                            <td th:text="'Efetivas de ' + ${currentUser.displayName}">Efetivas</td>
+                            <td th:each="perm : ${allPermissions}" class="cell"
+                                th:classappend="${myPermissions.contains(perm)} ? '' : 'off'"
+                                th:text="${myPermissions.contains(perm)} ? '✓' : '✕'"></td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+</body>
+</html>
