@@ -98,3 +98,15 @@ Só os testes desta atividade:
 - A autenticação é simulada (escolhe-se o usuário, sem senha). A autenticação real é a atividade 02.
 - Não há proteção CSRF nos formulários; ela chega com o Spring Security na atividade 02.
 - Não há hierarquia de papéis: o Gerente recebe as permissões explicitamente, em vez de herdar de outros papéis.
+
+## Uso de IA
+
+Nesta atividade, a IA (Claude) foi usada para:
+
+- explicar o modelo RBAC do NIST (usuários, papéis, permissões e as relações UA e PA) e conceitos relacionados, como menor privilégio, *default deny*, PDP e PEP;
+- discutir a modelagem do cenário: os papéis Vendedor, Estoquista e Gerente, e a matriz de permissões;
+- gerar a implementação completa: entidades, repositórios, serviço de controle de acesso, controller, tela e testes;
+- revisar a segurança da solução, por exemplo a checagem no servidor e não só na tela, a troca do ID de sessão no login e as limitações conhecidas;
+- redigir os comentários do código e este README.
+
+O cenário e as regras de acesso foram definidos por mim. O código foi revisado e testado por mim.

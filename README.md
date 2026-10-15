@@ -55,3 +55,16 @@ src/test/java/br/ufjf/dcc075/  testes, um pacote por atividade
 ```
 
 Cada atividade é um pacote independente (organização por funcionalidade). Para avaliar uma atividade, basta abrir a pasta dela.
+
+## Uso de Inteligência Artificial
+
+Este projeto foi desenvolvido com o apoio do **Claude** (Anthropic), usado como assistente de estudo e de programação. De forma geral, a IA foi usada para:
+
+- **Entender os conceitos:** explicar os temas de cada atividade, com exemplos e relação com a prática de mercado.
+- **Modelar e estruturar o projeto:** definir a organização em uma única aplicação Spring Boot, com um pacote por atividade, e discutir a modelagem de cada cenário.
+- **Gerar e revisar código:** criar telas, entidades, serviços e configurações, e apontar boas práticas e riscos de segurança durante o desenvolvimento.
+- **Documentar:** redigir os comentários do código e os READMEs.
+
+O grau de uso varia por atividade. Cada README de atividade tem uma seção **"Uso de IA"** dizendo o que foi feito com a ajuda da IA naquela entrega.
+
+Todo o código foi lido, executado e testado por mim. As decisões de projeto e a responsabilidade pelo conteúdo entregue são minhas.
