@@ -105,7 +105,7 @@ Nesta atividade, a IA (Claude) foi usada para:
 
 - explicar o modelo RBAC do NIST (usuários, papéis, permissões e as relações UA e PA) e conceitos relacionados, como menor privilégio, *default deny*, PDP e PEP;
 - discutir a modelagem do cenário: os papéis Vendedor, Estoquista e Gerente, e a matriz de permissões;
-- gerar a implementação completa: entidades, repositórios, serviço de controle de acesso, controller, tela e testes;
+- gerar a implementação de entidades, repositórios, serviço de controle de acesso, controller, tela e testes;
 - revisar a segurança da solução, por exemplo a checagem no servidor e não só na tela, a troca do ID de sessão no login e as limitações conhecidas;
 - redigir os comentários do código e este README.
 
