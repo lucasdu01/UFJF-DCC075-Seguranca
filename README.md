@@ -1,52 +1,57 @@
-# DCC075 – Segurança em Sistemas Computacionais (UFJF)
+# DCC075 – Segurança em Sistemas Computacionais
 
-Atividades práticas da disciplina reunidas em uma única aplicação Spring Boot.
-Cada atividade fica em seu próprio pacote em `src/main/java/br/ufjf/dcc075/`.
+Atividades práticas da disciplina DCC075 (Ciência da Computação – UFJF), reunidas em uma única aplicação web.
 
-## Como executar
+A página inicial mostra um menu com as atividades. Cada uma tem a própria tela, e o código de cada uma fica em um pacote separado, com um README próprio explicando o contexto.
 
-Requisitos: Java 21 (o Maven Wrapper baixa o Maven automaticamente).
+## Tecnologias
+
+- Java 21
+- Spring Boot 4 (Spring MVC + Thymeleaf para as telas)
+- Spring Data JPA + H2 (banco em memória, recriado a cada execução)
+- Maven (via Maven Wrapper, sem instalação prévia)
+
+## Como rodar
+
+Pré-requisito: JDK 21 instalado (`java -version`).
 
 ```bash
-./mvnw spring-boot:run      # sobe em http://localhost:8080
-./mvnw test                 # roda os testes
+./mvnw spring-boot:run        # Linux/macOS
+mvnw.cmd spring-boot:run      # Windows
 ```
 
-O banco é um H2 em memória, recriado a cada execução.
+Acesse **http://localhost:8080** e escolha uma atividade no menu.
 
----
+Para rodar os testes automatizados:
 
-## 01 – RBAC
+```bash
+./mvnw test
+```
 
-**Pacote:** `br.ufjf.dcc075.rbac` · **URL:** http://localhost:8080/rbac
+Para inspecionar o banco H2 durante a execução, os comandos SQL gerados aparecem no console (`spring.jpa.show-sql=true`).
 
-Cenário: controle de estoque de uma loja com três papéis.
+## Atividades
 
-| Papel      | VISUALIZAR_ESTOQUE | REGISTRAR_VENDA | REGISTRAR_ENTRADA | ALTERAR_PRECO |
-|------------|:-:|:-:|:-:|:-:|
-| VENDEDOR   | ✔ | ✔ |   |   |
-| ESTOQUISTA | ✔ |   | ✔ |   |
-| GERENTE    | ✔ | ✔ | ✔ | ✔ |
+| # | Atividade | Rota | Código e explicação |
+|---|-----------|------|---------------------|
+| 01 | RBAC – controle de acesso baseado em papéis | `/rbac` | [`rbac/`](src/main/java/br/ufjf/dcc075/rbac/README.md) |
+| 02 | OAuth2 (Google) + RBAC | `/oauth` | em breve |
+| 03 | Cifra de César + criptoanálise por frequência | `/cesar` | em breve |
+| 04 | Cifra de Feistel (16 rodadas) | `/feistel` | em breve |
 
-| Usuário | Papéis | Para que serve no teste |
-|---------|--------|-------------------------|
-| ana     | VENDEDOR | caso básico |
-| bruno   | ESTOQUISTA | caso básico |
-| carla   | GERENTE | caso básico |
-| diego   | VENDEDOR + ESTOQUISTA | permissões efetivas = união dos papéis |
-| eva     | nenhum | default deny |
+## Estrutura do projeto
 
-Mapeamento para o modelo RBAC0 do NIST:
+```
+src/main/java/br/ufjf/dcc075/
+├── Dcc075Application.java     ponto de entrada do Spring Boot
+├── home/                      menu inicial com a lista de atividades
+└── rbac/                      atividade 01 (README próprio)
 
-| NIST | Código |
-|------|--------|
-| U – usuários | `AppUser` |
-| R – papéis | `Role` |
-| P – permissões | `Permission` (enum) |
-| UA – usuário→papel | `AppUser.roles` (tabela `usuario_papeis`) |
-| PA – papel→permissão | `Role.permissions` (tabela `papel_permissoes`) |
-| Sessão | `HttpSession` com o usuário escolhido |
+src/main/resources/
+├── application.properties     configuração (banco H2, JPA)
+└── templates/                 telas Thymeleaf, uma pasta por atividade
 
-- `AccessControlService` é o **PDP** (Policy Decision Point): único lugar que decide.
-- `InventoryService` é o **PEP** (Policy Enforcement Point): checa a permissão antes de cada operação.
-- A autenticação é simulada (escolha do usuário sem senha); a autenticação real é a atividade 02.
+src/test/java/br/ufjf/dcc075/  testes, um pacote por atividade
+```
+
+Cada atividade é um pacote independente (organização por funcionalidade). Para avaliar uma atividade, basta abrir a pasta dela.
