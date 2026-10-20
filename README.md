@@ -9,11 +9,15 @@ A página inicial mostra um menu com as atividades. Cada uma tem a própria tela
 - Java 21
 - Spring Boot 4 (Spring MVC + Thymeleaf para as telas)
 - Spring Data JPA + H2 (banco em memória, recriado a cada execução)
+- Spring Security + OAuth2 Client (login com Google na atividade 02)
 - Maven (via Maven Wrapper, sem instalação prévia)
 
 ## Como rodar
 
 Pré-requisito: JDK 21 instalado (`java -version`).
+
+Para a atividade 02, copie `.env.example` para `.env` e preencha os valores
+(detalhes no [README da atividade](src/main/java/br/ufjf/dcc075/oauth/README.md)).
 
 ```bash
 ./mvnw spring-boot:run        # Linux/macOS
@@ -35,7 +39,7 @@ Para inspecionar o banco H2 durante a execução, os comandos SQL gerados aparec
 | # | Atividade | Rota | Código e explicação |
 |---|-----------|------|---------------------|
 | 01 | RBAC – controle de acesso baseado em papéis | `/rbac` | [`rbac/`](src/main/java/br/ufjf/dcc075/rbac/README.md) |
-| 02 | OAuth2 (Google) + RBAC | `/oauth` | em breve |
+| 02 | OAuth2 (Google) + RBAC | `/oauth` | [`oauth/`](src/main/java/br/ufjf/dcc075/oauth/README.md) |
 | 03 | Cifra de César + criptoanálise por frequência | `/cesar` | em breve |
 | 04 | Cifra de Feistel (16 rodadas) | `/feistel` | em breve |
 
@@ -45,7 +49,8 @@ Para inspecionar o banco H2 durante a execução, os comandos SQL gerados aparec
 src/main/java/br/ufjf/dcc075/
 ├── Dcc075Application.java     ponto de entrada do Spring Boot
 ├── home/                      menu inicial com a lista de atividades
-└── rbac/                      atividade 01 (README próprio)
+├── rbac/                      atividade 01 (README próprio)
+└── oauth/                     atividade 02 (README próprio)
 
 src/main/resources/
 ├── application.properties     configuração (banco H2, JPA)

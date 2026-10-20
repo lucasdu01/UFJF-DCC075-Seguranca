@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>02 – OAuth2 + RBAC | DCC075</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; }
+    section { border: 1px solid #ccc; border-radius: 8px; padding: 12px 16px; margin: 16px 0; }
+    .yes { color: #1f7a4d; }
+    .no  { color: #b3261e; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #ddd; }
+  </style>
+</head>
+<body>
+<a th:href="@{/}">&larr; Voltar ao menu</a>
+<h1>OAuth2 (Google) + RBAC</h1>
+
+<!-- 1. AUTENTICAÇÃO: quem é o usuário (dados do ID Token validado).
+     th:text escapa HTML, evitando o XSS que o tutorial original permitia. -->
+<section>
+  <h2>1. Autenticação (Google)</h2>
+  <p>Nome: <strong th:text="${name}">Nome</strong></p>
+  <p>E-mail: <span th:text="${email}">email@exemplo.com</span>
+    (<span th:text="${emailVerified} ? 'verificado pelo Google' : 'NÃO verificado'">verificado</span>)</p>
+</section>
+
+<!-- 2. MAPEAMENTO: atributo recebido do Google -> papéis do RBAC -->
+<section>
+  <h2>2. Papéis atribuídos (RBAC)</h2>
+  <p>Atributo usado: <code>email</code></p>
+  <p th:unless="${roles.isEmpty()}">Papéis: <strong th:text="${#strings.setJoin(roles, ', ')}">GERENTE</strong></p>
+  <p th:if="${roles.isEmpty()}" class="no">
+    Nenhum papel: este e-mail está autenticado, mas não está cadastrado no RBAC.
+    Autenticar não é autorizar (default deny).
+  </p>
+</section>
+
+<!-- 3. AUTORIZAÇÃO: resultado do controle de acesso para cada permissão -->
+<section>
+  <h2>3. Resultado do controle de acesso</h2>
+  <table>
+    <thead><tr><th>Permissão</th><th>Descrição</th><th>Resultado</th></tr></thead>
+    <tbody>
+    <tr th:each="perm : ${allPermissions}">
+      <td th:text="${perm}">PERMISSAO</td>
+      <td th:text="${perm.description}">descrição</td>
+      <td th:class="${permissions.contains(perm)} ? 'yes' : 'no'"
+          th:text="${permissions.contains(perm)} ? '✓ Permitido' : '✕ Negado'">resultado</td>
+    </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- Logout precisa ser POST; th:action injeta o token CSRF automaticamente. -->
+<form th:action="@{/logout}" method="post">
+  <button type="submit">Sair</button>
+</form>
+</body>
+</html>

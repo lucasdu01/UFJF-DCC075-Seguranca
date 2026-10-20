@@ -61,6 +61,12 @@
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
+		<!-- OAuth2 Client: login com Google (OIDC). Já traz o Spring Security. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security-oauth2-client</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

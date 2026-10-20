@@ -96,7 +96,7 @@ Só os testes desta atividade:
 ## Limitações
 
 - A autenticação é simulada (escolhe-se o usuário, sem senha). A autenticação real é a atividade 02.
-- Não há proteção CSRF nos formulários; ela chega com o Spring Security na atividade 02.
+- A proteção CSRF dos formulários não faz parte desta atividade: ela passou a valer com o Spring Security, adicionado na [atividade 02](../oauth/README.md).
 - Não há hierarquia de papéis: o Gerente recebe as permissões explicitamente, em vez de herdar de outros papéis.
 
 ## Uso de IA
