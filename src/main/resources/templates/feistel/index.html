@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>04 – Cifra de Feistel | DCC075</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; }
+        section { border: 1px solid #ccc; border-radius: 8px; padding: 12px 16px; margin: 16px 0; }
+        pre { white-space: pre-wrap; overflow-wrap: anywhere; } /* quebra textos longos dentro da caixa */
+        .erro { color: #b3261e; }
+    </style>
+</head>
+<body>
+<a th:href="@{/}">&larr; Voltar ao menu</a>
+<h1>Cifra de Feistel (16 rodadas)</h1>
+<p>Bloco de 64 bits, chave de 32 bits (8 dígitos hexadecimais), padding PKCS#7 e modo ECB.</p>
+
+<!-- 1. ENCRIPTAÇÃO: texto claro + chave -> cifrado em hexadecimal.
+     th:action injeta o token CSRF (sem ele o Spring Security responde 403). -->
+<section>
+    <h2>1. Encriptação</h2>
+    <form th:action="@{/feistel/cifrar}" method="post">
+        <p>
+            <label for="texto">Texto claro</label><br>
+            <textarea id="texto" name="texto" rows="4" cols="60" required th:text="${texto}"></textarea>
+        </p>
+        <p>
+            <label for="chaveCifrar">Chave (hex)</label>
+            <input id="chaveCifrar" name="chave" required maxlength="8" pattern="[0-9A-Fa-f]{8}"
+                   th:value="${chave ?: '1A2B3C4D'}">
+        </p>
+        <button type="submit">Cifrar</button>
+    </form>
+
+    <p th:if="${erroCifrar}" th:text="${erroCifrar}" class="erro">erro</p>
+
+    <!-- th:text escapa HTML: um <script> digitado aparece como texto, não executa -->
+    <div th:if="${textoCifrado}">
+        <h3>Texto cifrado (hex)</h3>
+        <pre th:text="${textoCifrado}">CIFRADO</pre>
+    </div>
+</section>
+
+<!-- 2. DECRIPTAÇÃO: cifrado em hexadecimal + chave -> texto claro -->
+<section>
+    <h2>2. Decriptação</h2>
+    <form th:action="@{/feistel/decifrar}" method="post">
+        <p>
+            <label for="cifrado">Texto cifrado (hex)</label><br>
+            <textarea id="cifrado" name="cifrado" rows="4" cols="60" required th:text="${cifrado}"></textarea>
+        </p>
+        <p>
+            <label for="chaveDecifrar">Chave (hex)</label>
+            <input id="chaveDecifrar" name="chave" required maxlength="8" pattern="[0-9A-Fa-f]{8}"
+                   th:value="${chave ?: '1A2B3C4D'}">
+        </p>
+        <button type="submit">Decifrar</button>
+    </form>
+
+    <p th:if="${erroDecifrar}" th:text="${erroDecifrar}" class="erro">erro</p>
+
+    <div th:if="${textoDecifrado}">
+        <h3>Texto decifrado</h3>
+        <pre th:text="${textoDecifrado}">TEXTO</pre>
+    </div>
+</section>
+</body>
+</html>
