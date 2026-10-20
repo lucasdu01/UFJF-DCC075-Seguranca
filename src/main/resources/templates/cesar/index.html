@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>03 – Cifra de César | DCC075</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; }
+        section { border: 1px solid #ccc; border-radius: 8px; padding: 12px 16px; margin: 16px 0; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #ddd; }
+        pre { white-space: pre-wrap; overflow-wrap: anywhere; } /* quebra textos longos dentro da caixa */
+    </style>
+</head>
+<body>
+<a th:href="@{/}">&larr; Voltar ao menu</a>
+<h1>Cifra de César</h1>
+
+<!-- 1. ENCRIPTAÇÃO: texto claro + chave k -> texto cifrado.
+     th:action injeta o token CSRF (sem ele o Spring Security responde 403). -->
+<section>
+    <h2>1. Encriptação</h2>
+    <form th:action="@{/cesar/cifrar}" method="post">
+        <p>
+            <label for="texto">Texto claro</label><br>
+            <textarea id="texto" name="texto" rows="4" cols="60" required th:text="${texto}"></textarea>
+        </p>
+        <p>
+            <label for="k">Chave k</label>
+            <input id="k" name="k" type="number" min="1" required th:value="${k ?: 3}">
+        </p>
+        <button type="submit">Cifrar</button>
+    </form>
+
+    <p th:if="${erroCifrar}" th:text="${erroCifrar}" style="color:#b3261e">erro</p>
+
+    <!-- th:text escapa HTML: um <script> digitado aparece como texto, não executa -->
+    <div th:if="${textoCifrado}">
+        <h3>Texto cifrado</h3>
+        <pre th:text="${textoCifrado}">TEXTO CIFRADO</pre>
+    </div>
+</section>
+
+<!-- 2. CRIPTOANÁLISE: só o texto cifrado -> frequências, k estimado e texto decifrado (formulário no passo 6) -->
+<!-- 2. CRIPTOANÁLISE: só o texto cifrado -> frequências, k estimado e texto decifrado -->
+<section>
+    <h2>2. Criptoanálise por frequência</h2>
+    <form th:action="@{/cesar/analisar}" method="post">
+        <p>
+            <label for="cifrado">Texto cifrado</label><br>
+            <!-- Pré-preenche com o resultado da seção 1, para facilitar a demonstração -->
+            <textarea id="cifrado" name="cifrado" rows="4" cols="60" required
+                      th:text="${cifrado ?: textoCifrado}"></textarea>
+        </p>
+        <button type="submit">Analisar</button>
+    </form>
+
+    <div th:if="${linhas}">
+        <h3>Resultado</h3>
+        <p>Chave estimada: <strong th:text="${kEstimado}">3</strong></p>
+        <p>Texto decifrado:</p>
+        <pre th:text="${textoDecifrado}">TEXTO DECIFRADO</pre>
+
+        <h3>Frequências (%)</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Letra</th>
+                <th>No texto cifrado</th>
+                <th>Português (esperada)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="linha : ${linhas}">
+                <td th:text="${linha.letra}">A</td>
+                <td th:text="${#numbers.formatDecimal(linha.observada, 1, 2)}">0,00</td>
+                <td th:text="${#numbers.formatDecimal(linha.esperada, 1, 2)}">14,63</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

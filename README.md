@@ -40,7 +40,7 @@ Para inspecionar o banco H2 durante a execução, os comandos SQL gerados aparec
 |---|-----------|------|---------------------|
 | 01 | RBAC – controle de acesso baseado em papéis | `/rbac` | [`rbac/`](src/main/java/br/ufjf/dcc075/rbac/README.md) |
 | 02 | OAuth2 (Google) + RBAC | `/oauth` | [`oauth/`](src/main/java/br/ufjf/dcc075/oauth/README.md) |
-| 03 | Cifra de César + criptoanálise por frequência | `/cesar` | em breve |
+| 03 | Cifra de César + criptoanálise por frequência | `/cesar` | [`cesar/`](src/main/java/br/ufjf/dcc075/cesar/README.md) |
 | 04 | Cifra de Feistel (16 rodadas) | `/feistel` | em breve |
 
 ## Estrutura do projeto
@@ -50,7 +50,8 @@ src/main/java/br/ufjf/dcc075/
 ├── Dcc075Application.java     ponto de entrada do Spring Boot
 ├── home/                      menu inicial com a lista de atividades
 ├── rbac/                      atividade 01 (README próprio)
-└── oauth/                     atividade 02 (README próprio)
+├── oauth/                     atividade 02 (README próprio)
+└── cesar/                     atividade 03 (README próprio)
 
 src/main/resources/
 ├── application.properties     configuração (banco H2, JPA)
