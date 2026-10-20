@@ -42,6 +42,7 @@ Para inspecionar o banco H2 durante a execução, os comandos SQL gerados aparec
 | 02 | OAuth2 (Google) + RBAC | `/oauth` | [`oauth/`](src/main/java/br/ufjf/dcc075/oauth/README.md) |
 | 03 | Cifra de César + criptoanálise por frequência | `/cesar` | [`cesar/`](src/main/java/br/ufjf/dcc075/cesar/README.md) |
 | 04 | Cifra de Feistel (16 rodadas) | `/feistel` | [`feistel/`](src/main/java/br/ufjf/dcc075/feistel/README.md) |
+| 05 | AES: confusão, difusão e efeito avalanche (script Python) | — | [`python/05-aes/`](python/05-aes/README.md) |
 
 ## Estrutura do projeto
 
@@ -59,6 +60,8 @@ src/main/resources/
 └── templates/                 telas Thymeleaf, uma pasta por atividade
 
 src/test/java/br/ufjf/dcc075/  testes, um pacote por atividade
+
+python/05-aes/                 atividade 05: script Python fornecido pelo professor (fora do Spring)
 ```
 
 Cada atividade é um pacote independente (organização por funcionalidade). Para avaliar uma atividade, basta abrir a pasta dela.
