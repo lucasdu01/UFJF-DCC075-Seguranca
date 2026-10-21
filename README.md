@@ -43,7 +43,9 @@ Para inspecionar o banco H2 durante a execução, os comandos SQL gerados aparec
 | 03 | Cifra de César + criptoanálise por frequência | `/cesar` | [`cesar/`](src/main/java/br/ufjf/dcc075/cesar/README.md) |
 | 04 | Cifra de Feistel (16 rodadas) | `/feistel` | [`feistel/`](src/main/java/br/ufjf/dcc075/feistel/README.md) |
 | 05 | AES: confusão, difusão e efeito avalanche (script Python) | — | [`python/05-aes/`](python/05-aes/README.md) |
+| 06 | Modos de operação do AES com OpenSSL (imagem do Tux) | — | [`openssl/06-modos-operacao/`](openssl/06-modos-operacao/README.md) |
 | 07 | Blum Blum Shub + suíte de testes NIST | `/bbs` | [`bbs/`](src/main/java/br/ufjf/dcc075/bbs/README.md) |
+| 08 | Diffie-Hellman (primo de 2048 bits do RFC 3526) | `/dh` | [`dh/`](src/main/java/br/ufjf/dcc075/dh/README.md) |
 
 ## Estrutura do projeto
 
@@ -55,7 +57,8 @@ src/main/java/br/ufjf/dcc075/
 ├── oauth/                     atividade 02 (README próprio)
 ├── cesar/                     atividade 03 (README próprio)
 ├── feistel/                   atividade 04 (README próprio)
-└── bbs/                       atividade 07 (README próprio)
+├── bbs/                       atividade 07 (README próprio)
+└── dh/                        atividade 08 (README próprio)
 
 src/main/resources/
 ├── application.properties     configuração (banco H2, JPA)
@@ -64,6 +67,7 @@ src/main/resources/
 src/test/java/br/ufjf/dcc075/  testes, um pacote por atividade
 
 python/05-aes/                 atividade 05: script Python fornecido pelo professor (fora do Spring)
+openssl/06-modos-operacao/     atividade 06: script de terminal com OpenSSL (fora do Spring)
 ```
 
 Cada atividade é um pacote independente (organização por funcionalidade). Para avaliar uma atividade, basta abrir a pasta dela.

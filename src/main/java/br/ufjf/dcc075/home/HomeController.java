@@ -18,7 +18,8 @@ public class HomeController {
             new Activity("02 – OAuth2 + RBAC", "Login com Google e autorização por papéis", "/oauth"),
             new Activity("03 – Cifra de César", "Encriptação e criptoanálise por frequência de letras", "/cesar"),
             new Activity("04 – Cifra de Feistel", "16 rodadas com encriptação e decriptação", "/feistel"),
-            new Activity("07 – Blum Blum Shub", "Gerador pseudoaleatório testado na suíte NIST", "/bbs")
+            new Activity("07 – Blum Blum Shub", "Gerador pseudoaleatório testado na suíte NIST", "/bbs"),
+            new Activity("08 – Diffie-Hellman", "Troca de chaves com primo de 2048 bits", "/dh")
     );
 
     // Responde a GET "/" e devolve o template "index" (templates/index.html)
