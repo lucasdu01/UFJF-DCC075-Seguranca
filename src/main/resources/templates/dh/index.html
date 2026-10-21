@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>08 – Diffie-Hellman | DCC075</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 760px; margin: 24px auto; padding: 0 16px; }
+        section { border: 1px solid #ccc; border-radius: 8px; padding: 12px 16px; margin: 16px 0; }
+        textarea { width: 100%; font-family: ui-monospace, monospace; font-size: 12px; }
+        pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; margin: 4px 0 10px; } /* quebra os números longos */
+        ul { list-style: none; padding-left: 0; }
+        .ok { color: #1e7d32; }
+        .erro { color: #b3261e; }
+        .publico { background: #f3f6fb; }
+        .secreto { background: #fbf6ee; }
+    </style>
+</head>
+<body>
+<a th:href="@{/}">&larr; Voltar ao menu</a>
+<h1>Diffie-Hellman</h1>
+<p>
+    Públicos: p (primo) e g (raiz primitiva mod p) &nbsp;·&nbsp; A = g<sup>a</sup> mod p &nbsp;·&nbsp;
+    B = g<sup>b</sup> mod p &nbsp;·&nbsp; s = B<sup>a</sup> mod p = A<sup>b</sup> mod p
+</p>
+
+<!-- 1. PARÂMETROS. th:action injeta o token CSRF (sem ele o Spring Security responde 403). -->
+<section>
+    <h2>1. Parâmetros</h2>
+    <form th:action="@{/dh/calcular}" method="post">
+        <p>
+            <label for="p">p – primo (hexadecimal). Padrão: primo de 2048 bits do RFC 3526</label><br>
+            <textarea id="p" name="p" rows="5" required th:text="${p}"></textarea>
+        </p>
+        <p>
+            <label for="g">g – raiz primitiva módulo p (decimal)</label>
+            <input id="g" name="g" required inputmode="numeric" pattern="\d{1,30}" th:value="${g}">
+        </p>
+        <p>
+            <label for="a">a – chave privada da Alice (hexadecimal)</label><br>
+            <textarea id="a" name="a" rows="5" required th:text="${a}"></textarea>
+        </p>
+        <p>
+            <label for="b">b – chave privada do Bob (hexadecimal)</label><br>
+            <textarea id="b" name="b" rows="5" required th:text="${b}"></textarea>
+        </p>
+        <button type="submit">Calcular</button>
+        <!-- formaction troca o destino: mantém p e g e sorteia novos a e b -->
+        <button type="submit" th:formaction="@{/dh/sortear}" formnovalidate>Sortear novos a e b</button>
+    </form>
+
+    <p th:if="${erro}" th:text="${erro}" class="erro">erro</p>
+</section>
+
+<!-- 2. PREMISSAS: cada condição com ✓ ou ✗ -->
+<section th:if="${premissas}">
+    <h2>2. Premissas</h2>
+    <ul>
+        <li th:each="premissa : ${premissas}" th:class="${premissa.atendida} ? 'ok' : 'erro'">
+            <span th:text="${premissa.atendida} ? '✓' : '✗'">✓</span>
+            <span th:text="${premissa.descricao}">premissa</span>
+        </li>
+    </ul>
+</section>
+
+<!-- 3. TROCA: só aparece se todas as premissas foram atendidas -->
+<th:block th:if="${segredoAlice}">
+    <section class="publico">
+        <h2>3. Canal público (o que um espião vê)</h2>
+        <p>p tem <b th:text="${bits}">2048</b> bits; g = <b th:text="${g}">11</b></p>
+        <h3>A = g<sup>a</sup> mod p (Alice → Bob)</h3>
+        <pre th:text="${publicaAlice}">A</pre>
+        <h3>B = g<sup>b</sup> mod p (Bob → Alice)</h3>
+        <pre th:text="${publicaBob}">B</pre>
+    </section>
+
+    <section class="secreto">
+        <h2>4. Segredo calculado por cada lado (nunca trafega)</h2>
+        <h3>Alice: s = B<sup>a</sup> mod p</h3>
+        <pre th:text="${segredoAlice}">s</pre>
+        <h3>Bob: s = A<sup>b</sup> mod p</h3>
+        <pre th:text="${segredoBob}">s</pre>
+        <p th:if="${iguais}" class="ok"><b>✓ Os dois lados chegaram ao mesmo segredo.</b></p>
+        <p th:unless="${iguais}" class="erro"><b>✗ Os segredos são diferentes.</b></p>
+    </section>
+</th:block>
+</body>
+</html>
