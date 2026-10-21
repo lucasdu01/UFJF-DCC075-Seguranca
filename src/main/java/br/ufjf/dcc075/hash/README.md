@@ -51,6 +51,12 @@ Digite um texto e clique em **Calcular hash**: a tela mostra o hash e o estado d
 ./mvnw test -Dtest=HashXorRotacaoTest
 ```
 
+## Captura de tela
+
+Hash de `Ola, mundo!` com o estado depois de cada bloco
+
+![Tela](../../../../../../../docs/09-hash/01-tela.png)
+
 ## Uso de IA
 
 Nesta atividade, a IA (Claude) foi usada para gerar o código, os testes e este README, conferir os valores com
