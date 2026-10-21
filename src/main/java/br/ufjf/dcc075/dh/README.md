@@ -2,11 +2,28 @@
 
 > Implementar um DH (Diffie-Hellman) para compartilhamento de segredo (valor de s). Enviar o código e valores
 > das variáveis escolhidos (p, g, a, b, e calculados, como o A e B).
-> p → número primo; g → raiz primitiva módulo p.
 
-## Valores entregues
+## A ideia
 
-Todos em hexadecimal, exceto g. p e g são públicos; a e b são privados; A e B trafegam no canal público; s nunca trafega.
+Alice e Bob combinam um segredo s por um canal público, sem nunca transmiti-lo:
+
+```
+Públicos: p (primo) e g (raiz primitiva mod p)
+Alice: a (secreto)  →  envia A = gᵃ mod p
+Bob:   b (secreto)  →  envia B = gᵇ mod p
+s = Bᵃ mod p = Aᵇ mod p = gᵃᵇ mod p
+```
+
+Quem escuta vê p, g, A e B, mas para chegar a s precisaria descobrir a ou b (problema do logaritmo discreto).
+
+- **p:** primo de 2048 bits do RFC 3526 (grupo 14). É um primo seguro (p = 2q + 1, com q primo), o que permite
+  verificar a raiz primitiva testando só g² ≢ 1 e g^q ≢ 1 (mod p).
+- **g = 11:** menor raiz primitiva módulo p (o g = 2 do RFC não é raiz primitiva).
+- **a e b:** sorteados com `SecureRandom`.
+
+## Valores
+
+Em hexadecimal, exceto g.
 
 ```
 p (RFC 3526, grupo 14, 2048 bits):
@@ -72,117 +89,35 @@ FFED47E6 96C3A019 3E8C06F4 2378B59B B53A9973 3F54E64F CC914F2D 3A2A20EF
 7509BEC1 FEA17AB5 732BC13E F64BFB14 D1A45671 B745E356 E665A4E3 C9479028
 ```
 
-| Valor | Tamanho | Origem |
-|-------|---------|--------|
-| p | 2048 bits | primo do RFC 3526 (grupo 14), usado em TLS, SSH e IPsec |
-| g | 11 | menor raiz primitiva módulo p, encontrada e verificada pelo código |
-| a, b | 2048 bits | sorteados com gerador criptográfico, no intervalo [2, p−2] |
-| A, B, s | 2048 bits | calculados; conferidos com uma implementação independente em Python |
-
-## A ideia
-
-Duas pessoas que só conversam por um canal público combinam um segredo sem nunca transmiti-lo:
-
-```
-Públicos: p (primo) e g (raiz primitiva mod p)
-Alice sorteia a (secreto)  →  envia A = gᵃ mod p
-Bob   sorteia b (secreto)  →  envia B = gᵇ mod p
-Alice calcula s = Bᵃ mod p = (gᵇ)ᵃ = gᵃᵇ mod p
-Bob   calcula s = Aᵇ mod p = (gᵃ)ᵇ = gᵃᵇ mod p      → o mesmo s
-```
-
-Quem escuta o canal vê p, g, A e B. Para calcular s, precisaria descobrir a a partir de A = gᵃ mod p, o
-**problema do logaritmo discreto**, inviável com p de 2048 bits. A exponenciação modular é rápida
-(`BigInteger.modPow`); desfazê-la não é.
-
-**Exemplo à mão** (p = 23, g = 5, a = 6, b = 15), usado nos testes:
-
-```
-A = 5⁶ mod 23 = 15625 mod 23 = 8
-B = 5¹⁵ mod 23 = 5⁸·5⁴·5²·5 = 16·4·2·5 = 640 mod 23 = 19
-Alice: s = 19⁶ mod 23 = 2        Bob: s = 8¹⁵ mod 23 = 2   ✓
-```
-
-### Raiz primitiva e primo seguro
-
-g é **raiz primitiva** módulo p quando suas potências geram todos os valores de 1 a p−1, ou seja, quando
-g^((p−1)/f) ≢ 1 (mod p) para todo fator primo f de p−1. Verificar isso exige **fatorar p−1**, o que é inviável
-para um p de 2048 bits qualquer.
-
-Por isso o p escolhido é um **primo seguro**: p = 2q + 1, com q também primo. Os únicos fatores de p−1 são 2 e q,
-e o teste vira duas exponenciações: g² ≢ 1 e g^q ≢ 1 (mod p). O valor de p foi conferido com a fórmula do
-RFC 3526, e o código confirma que p e q são primos (Miller-Rabin).
-
-O gerador do próprio RFC é **g = 2**, mas ele **não é raiz primitiva**: 2^q ≡ 1 (mod p), então gera só o subgrupo
-de ordem q. Os valores de 2 a 10 também não são; **11 é a menor raiz primitiva**. Mesmo exemplo em escala pequena:
-23 = 2·11 + 1 é primo seguro, 5 é raiz primitiva e 2 não (2¹¹ ≡ 1 mod 23).
-
-## Limitações (onde o DH falha)
-
-- **Man-in-the-middle.** O DH puro não autentica ninguém: um atacante no meio faz uma troca com Alice e outra
-  com Bob e lê tudo. Por isso, no TLS, os valores do DH são assinados com o certificado do servidor.
-- **Tamanho e reuso de p.** O ataque Logjam (2015) quebrou o DH de 512 bits e mostrou que primos de 1024 bits
-  muito compartilhados podem ser pré-computados por um atacante com muitos recursos. Hoje, o mínimo é 2048 bits.
-- **Raiz primitiva vaza 1 bit.** Como pede o enunciado, g é raiz primitiva, mas isso tem um custo: pelo critério
-  de Euler, qualquer um calcula se A é resíduo quadrático (A^q mod p = 1) e descobre se **a é par ou ímpar**. O
-  mesmo vale para b, e com as duas paridades se descobre se s é resíduo quadrático. Por isso o RFC 3526 e o RFC 7919 usam um g que gera só o subgrupo de ordem q
-  (como o g = 2), em que todo valor é resíduo quadrático e esse bit não vaza.
-- **Chave pública maliciosa.** Se alguém envia A = 1 ou A = p−1, o segredo fica 1 ou ±1, qualquer que seja a chave
-  privada. O código valida que 1 < A < p−1 antes de calcular o segredo.
-- **s não é usado direto como chave.** Na prática, o segredo passa por uma função de derivação (como a HKDF) antes
-  de virar chave do AES.
-
 ## Arquivos
 
 ```
 dh/
-├── DiffieHellman.java  primo seguro, raiz primitiva, chaves privadas (SecureRandom), chaves públicas e segredo
-└── DhController.java   página da atividade: parâmetros, premissas ✓/✗, canal público e segredo de cada lado
+├── DiffieHellman.java  primo seguro, raiz primitiva, chaves privadas, chaves públicas e segredo
+└── DhController.java   página da atividade
 ```
 
 Tela: `src/main/resources/templates/dh/index.html`
 Testes: `src/test/java/br/ufjf/dcc075/dh/DiffieHellmanTest.java`
+Relatório (PDF): [`docs/08-dh/relatorio_dh.pdf`](../../../../../../../docs/08-dh/relatorio_dh.pdf)
 
 ## Como rodar
 
 Suba a aplicação (veja o [README principal](../../../../../../../README.md)) e acesse **http://localhost:8080/dh**.
-A página é pública, não exige login.
-
-1. O formulário já vem com p (RFC 3526), g = 11 e os valores de a e b acima. Clique em **Calcular**.
-2. A tela mostra as premissas com ✓/✗, o que trafega no canal público (A e B) e o segredo calculado por cada lado.
-3. **Sortear novos a e b** mantém p e g e sorteia novas chaves privadas: o segredo muda, mas continua igual nos dois lados.
-
-Testes automatizados (exemplo à mão, primo seguro, raiz primitiva, valores da atividade, chaves sorteadas, validação):
+O formulário já vem com os valores acima: clique em **Calcular**. **Sortear novos a e b** gera outras chaves privadas.
 
 ```bash
 ./mvnw test -Dtest=DiffieHellmanTest
 ```
 
-## Segurança da aplicação
-
-- **`SecureRandom`** para as chaves privadas: com `java.util.Random`, a chave poderia ser prevista (CWE-338).
-- **Validação da chave pública recebida** (1 < A < p−1), contra ataques de subgrupo pequeno.
-- **Entrada validada no servidor** (CWE-20): p, a e b em hexadecimal com até 512 dígitos (2048 bits) e g decimal
-  com até 30 dígitos. O limite evita números gigantes que travariam o servidor (CWE-400).
-- Formulário com token **CSRF** (`th:action`) e saída com `th:text`, que escapa HTML (XSS).
-
 ## Capturas de tela
 
-**1. Parâmetros e premissas:** p de 2048 bits, g = 11, a e b; todas as premissas atendidas
-
 ![Parâmetros](../../../../../../../docs/08-dh/01-parametros.png)
-
-**2. Troca:** A e B no canal público; Alice e Bob chegam ao mesmo segredo s
 
 ![Resultado](../../../../../../../docs/08-dh/02-resultado.png)
 
 ## Uso de IA
 
-Nesta atividade, a IA (Claude) foi usada para:
-
-- explicar o Diffie-Hellman, a raiz primitiva, o primo seguro e as fraquezas do protocolo;
-- escolher o primo do RFC 3526, conferi-lo com a fórmula do RFC e encontrar a menor raiz primitiva;
-- sortear a e b e conferir A, B e s com uma implementação independente em Python;
-- gerar o código das classes, da tela, dos testes e deste README.
-
-A integração ao projeto, a execução dos testes e a validação na tela foram feitas por mim.
+Nesta atividade, a IA (Claude) foi usada para explicar o Diffie-Hellman, escolher p e encontrar g, sortear a e b
+e conferir A, B e s em Python, e gerar o código, os testes, este README e o relatório.
+A execução dos testes e a validação na tela foram feitas por mim.
