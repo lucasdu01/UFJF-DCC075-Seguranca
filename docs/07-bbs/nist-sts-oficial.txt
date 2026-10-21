@@ -1,0 +1,31 @@
+NIST SP 800-22 Statistical Test Suite (sts-2.1.2, código C oficial) — verificação cruzada
+Entrada: bbs-bits.txt (1.000.000 bits, ASCII), 1 sequência; parâmetros padrão do STS.
+Critério: p-value >= 0,01 (alfa = 1%).
+
+Frequency                0.863438 
+BlockFrequency           0.878040 
+Runs                     0.073781 
+LongestRun               0.683205 
+Rank                     0.973954 
+FFT                      0.232884 
+OverlappingTemplate      0.759154 
+Universal                0.422085 
+LinearComplexity         0.831043 
+Serial                   0.976970 0.861640 
+ApproximateEntropy       0.908249 
+CumulativeSums           0.511427 0.663369 
+RandomExcursions         0.757918 0.646588 0.690648 0.452628 0.291379 0.480981 0.094458 0.203295 
+RandomExcursionsVariant  0.766054 0.554334 0.562976 0.630617 0.682591 0.950703 0.742018 0.611729 0.278513 0.499844 0.547144 0.327875 0.334041 0.309863 0.405265 0.440568 0.310764 0.197279 
+NonOverlappingTemplate   144/148 templates com p-value >= 0,01
+
+Detalhe do Runs Test (stats.txt):
+		COMPUTATIONAL INFORMATION:
+		------------------------------------------
+		(a) Pi                        = 0.500086
+		(b) V_n_obs (Total # of runs) = 499106
+		(c) V_n_obs - 2 n pi (1-pi)
+		    -----------------------   = 1.264286
+		      2 sqrt(2n) pi (1-pi)
+		------------------------------------------
+SUCCESS		p_value = 0.073781
+

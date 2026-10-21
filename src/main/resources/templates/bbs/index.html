@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>07 – Blum Blum Shub | DCC075</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; }
+        section { border: 1px solid #ccc; border-radius: 8px; padding: 12px 16px; margin: 16px 0; }
+        pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; } /* quebra a sequência longa */
+        label { display: inline-block; min-width: 150px; }
+        ul { list-style: none; padding-left: 0; }
+        .ok { color: #1e7d32; }
+        .erro { color: #b3261e; }
+    </style>
+</head>
+<body>
+<a th:href="@{/}">&larr; Voltar ao menu</a>
+<h1>Blum Blum Shub (BBS)</h1>
+<p>
+    n = p · q, com p ≡ q ≡ 3 (mod 4) &nbsp;·&nbsp; x<sub>0</sub> = s² mod n &nbsp;·&nbsp;
+    x<sub>i+1</sub> = x<sub>i</sub>² mod n &nbsp;·&nbsp; bit<sub>i</sub> = x<sub>i</sub> mod 2
+</p>
+
+<!-- 1. PARÂMETROS. th:action injeta o token CSRF (sem ele o Spring Security responde 403). -->
+<section>
+    <h2>1. Parâmetros</h2>
+    <form th:action="@{/bbs/gerar}" method="post">
+        <p>
+            <label for="p">p (primo)</label>
+            <input id="p" name="p" required inputmode="numeric" pattern="\d{1,30}" th:value="${p}">
+        </p>
+        <p>
+            <label for="q">q (primo)</label>
+            <input id="q" name="q" required inputmode="numeric" pattern="\d{1,30}" th:value="${q}">
+        </p>
+        <p>
+            <label for="s">s (semente)</label>
+            <input id="s" name="s" required inputmode="numeric" pattern="\d{1,30}" th:value="${s}">
+        </p>
+        <p>
+            <label for="quantidade">Quantidade de bits</label>
+            <input id="quantidade" name="quantidade" type="number" required min="1" max="1000000"
+                   th:value="${quantidade}">
+        </p>
+        <button type="submit">Gerar</button>
+    </form>
+
+    <p th:if="${erro}" th:text="${erro}" class="erro">erro</p>
+</section>
+
+<!-- 2. PREMISSAS: cada condição do algoritmo com ✓ ou ✗ -->
+<section th:if="${premissas}">
+    <h2>2. Premissas</h2>
+    <ul>
+        <li th:each="premissa : ${premissas}" th:class="${premissa.atendida} ? 'ok' : 'erro'">
+            <span th:text="${premissa.atendida} ? '✓' : '✗'">✓</span>
+            <span th:text="${premissa.descricao}">premissa</span>
+        </li>
+    </ul>
+</section>
+
+<!-- 3. RESULTADO: só aparece se todas as premissas foram atendidas -->
+<section th:if="${previa}">
+    <h2>3. Bits gerados</h2>
+    <p>n = p · q = <b th:text="${n}">n</b></p>
+    <p>
+        <span th:text="${#numbers.formatInteger(quantidade, 1, 'POINT')}">0</span> bits:
+        <span th:text="${#numbers.formatInteger(zeros, 1, 'POINT')}">0</span> zeros e
+        <span th:text="${#numbers.formatInteger(uns, 1, 'POINT')}">0</span> uns
+    </p>
+    <p th:if="${semRepeticao}" class="ok">
+        ✓ A sequência não volta ao x<sub>0</sub> nos passos gerados: o período é maior que a quantidade de bits.
+    </p>
+    <p th:unless="${semRepeticao}" class="erro">
+        ✗ A sequência se repete a cada <span th:text="${periodo}">0</span> passos: os bits gerados contêm repetição.
+    </p>
+
+    <h3>Primeiros bits</h3>
+    <pre th:text="${previa}">0101</pre>
+
+    <p>
+        <a th:href="@{/bbs/bits.txt(p=${p}, q=${q}, s=${s}, quantidade=${quantidade})}">Baixar a sequência completa (.txt)</a>
+        — para colar no testador NIST, no Terminal: <code>pbcopy &lt; ~/Downloads/bbs-bits.txt</code>
+    </p>
+</section>
+</body>
+</html>

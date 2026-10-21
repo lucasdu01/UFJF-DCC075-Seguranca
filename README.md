@@ -43,6 +43,7 @@ Para inspecionar o banco H2 durante a execução, os comandos SQL gerados aparec
 | 03 | Cifra de César + criptoanálise por frequência | `/cesar` | [`cesar/`](src/main/java/br/ufjf/dcc075/cesar/README.md) |
 | 04 | Cifra de Feistel (16 rodadas) | `/feistel` | [`feistel/`](src/main/java/br/ufjf/dcc075/feistel/README.md) |
 | 05 | AES: confusão, difusão e efeito avalanche (script Python) | — | [`python/05-aes/`](python/05-aes/README.md) |
+| 07 | Blum Blum Shub + suíte de testes NIST | `/bbs` | [`bbs/`](src/main/java/br/ufjf/dcc075/bbs/README.md) |
 
 ## Estrutura do projeto
 
@@ -53,7 +54,8 @@ src/main/java/br/ufjf/dcc075/
 ├── rbac/                      atividade 01 (README próprio)
 ├── oauth/                     atividade 02 (README próprio)
 ├── cesar/                     atividade 03 (README próprio)
-└── feistel/                   atividade 04 (README próprio)
+├── feistel/                   atividade 04 (README próprio)
+└── bbs/                       atividade 07 (README próprio)
 
 src/main/resources/
 ├── application.properties     configuração (banco H2, JPA)
