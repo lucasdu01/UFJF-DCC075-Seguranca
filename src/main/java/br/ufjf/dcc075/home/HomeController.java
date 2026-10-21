@@ -19,7 +19,8 @@ public class HomeController {
             new Activity("03 – Cifra de César", "Encriptação e criptoanálise por frequência de letras", "/cesar"),
             new Activity("04 – Cifra de Feistel", "16 rodadas com encriptação e decriptação", "/feistel"),
             new Activity("07 – Blum Blum Shub", "Gerador pseudoaleatório testado na suíte NIST", "/bbs"),
-            new Activity("08 – Diffie-Hellman", "Troca de chaves com primo de 2048 bits", "/dh")
+            new Activity("08 – Diffie-Hellman", "Troca de chaves com primo de 2048 bits", "/dh"),
+            new Activity("09 – Hash simples", "XOR com rotação, bloco a bloco", "/hash")
     );
 
     // Responde a GET "/" e devolve o template "index" (templates/index.html)

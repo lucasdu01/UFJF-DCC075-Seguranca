@@ -18,7 +18,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http, GoogleRbacUserService googleRbacUserService) throws Exception {
         http.authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/", "/rbac", "/rbac/**", "/cesar/**", "/feistel/**", "/bbs/**", "/dh/**", "/error")
+                                .requestMatchers("/", "/rbac", "/rbac/**", "/cesar/**", "/feistel/**", "/bbs/**", "/dh/**", "/hash/**", "/error")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated())

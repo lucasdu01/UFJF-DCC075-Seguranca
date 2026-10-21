@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>09 – Hash XOR com rotação | DCC075</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; }
+        section { border: 1px solid #ccc; border-radius: 8px; padding: 12px 16px; margin: 16px 0; }
+        table { border-collapse: collapse; font-family: ui-monospace, monospace; }
+        th, td { border: 1px solid #ccc; padding: 2px 10px; text-align: right; }
+        .hash { font-family: ui-monospace, monospace; font-size: 22px; }
+        .erro { color: #b3261e; }
+    </style>
+</head>
+<body>
+<a th:href="@{/}">&larr; Voltar ao menu</a>
+<h1>Hash simples: XOR com rotação</h1>
+<p>Padding 0x80 + zeros até múltiplo de 4 bytes; para cada bloco de 32 bits: h = rotl(h, 5) XOR bloco.
+    Valor inicial: 6A09E667.</p>
+
+<!-- th:action injeta o token CSRF (sem ele o Spring Security responde 403) -->
+<section>
+    <form th:action="@{/hash/calcular}" method="post">
+        <p>
+            <label for="texto">Texto</label><br>
+            <textarea id="texto" name="texto" rows="3" cols="60" maxlength="1000" th:text="${texto}"></textarea>
+        </p>
+        <button type="submit">Calcular hash</button>
+    </form>
+    <p th:if="${erro}" th:text="${erro}" class="erro">erro</p>
+</section>
+
+<section th:if="${resultado}">
+    <h2>Hash (32 bits)</h2>
+    <p class="hash" th:text="${resultado}">00000000</p>
+
+    <h3>Passo a passo</h3>
+    <table>
+        <tr><th>#</th><th>Bloco</th><th>h depois do bloco</th></tr>
+        <tr><td>–</td><td>(valor inicial)</td><td>6A09E667</td></tr>
+        <tr th:each="passo, i : ${passos}">
+            <td th:text="${i.count}">1</td>
+            <td th:text="${passo.bloco}">00000000</td>
+            <td th:text="${passo.estado}">00000000</td>
+        </tr>
+    </table>
+</section>
+</body>
+</html>
