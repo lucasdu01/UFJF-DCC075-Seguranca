@@ -46,7 +46,7 @@ Para inspecionar o banco H2 durante a execução, os comandos SQL gerados aparec
 | 06 | Modos de operação do AES com OpenSSL (imagem do Tux) | — | [`openssl/06-modos-operacao/`](openssl/06-modos-operacao/README.md) |
 | 07 | Blum Blum Shub + suíte de testes NIST | `/bbs` | [`bbs/`](src/main/java/br/ufjf/dcc075/bbs/README.md) |
 | 08 | Diffie-Hellman (primo de 2048 bits do RFC 3526) | `/dh` | [`dh/`](src/main/java/br/ufjf/dcc075/dh/README.md) |
-| 09 | Hash simples com XOR e rotação (parte 3) | `/hash` | [`hash/`](src/main/java/br/ufjf/dcc075/hash/README.md) |
+| 09 | Hash: SHA-256 passo a passo, algoritmos atuais e hash XOR com rotação | `/hash` | [`hash/`](src/main/java/br/ufjf/dcc075/hash/README.md) |
 
 ## Estrutura do projeto
 

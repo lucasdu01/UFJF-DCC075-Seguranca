@@ -1,7 +1,13 @@
-# Atividade 09 – Hash (parte 3: hash simples com XOR e rotação)
+# Atividade 09 – Hash
 
+> 1) Explicar passo a passo o SHA (que pode ser o SHA-256 do vídeo indicado).
+> 2) Realizar uma busca sobre os principais algoritmos de hash utilizados atualmente e escrever um texto de,
+> ao menos, 200 palavras sobre seus pontos fortes e fracos.
 > 3) Gerar um código simples de hash baseado em algo simples, como: utilizando somente XOR bloco a bloco,
 > XOR com rotação, etc.
+
+As partes 1 e 2 são textos e estão no relatório [`docs/09-hash/relatorio_hash.pdf`](../../../../../../../docs/09-hash/relatorio_hash.pdf),
+junto com a parte 3. Este README trata da parte 3, o código.
 
 ## A ideia
 
@@ -59,6 +65,7 @@ Hash de `Ola, mundo!` com o estado depois de cada bloco
 
 ## Uso de IA
 
-Nesta atividade, a IA (Claude) foi usada para gerar o código, os testes e este README, conferir os valores com
+Nesta atividade, a IA (Claude) foi usada para explicar o SHA-256 em português com os valores do exemplo do vídeo,
+revisar os textos das partes 1 e 2, gerar o código, os testes, este README e o relatório, conferir os valores com
 uma implementação em Python e encontrar a colisão de exemplo. A execução dos testes e a validação na tela foram
 feitas por mim.
